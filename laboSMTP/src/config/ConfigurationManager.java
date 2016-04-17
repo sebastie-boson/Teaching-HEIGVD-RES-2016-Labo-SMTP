@@ -56,7 +56,7 @@ public class ConfigurationManager implements IConfigurationManager {
             witnessToCC = new Person(prop.getProperty("witnessToCC"));
 
             // test if number of groups is correct
-            if (groupsNumber == 0) {
+            if (groupsNumber < 1) {
                 System.out.println("The number of group is incorrect !");
 
                 // we must change the number of group
@@ -136,6 +136,13 @@ public class ConfigurationManager implements IConfigurationManager {
                 }
             }
 
+            if (mailsList.size() < 1) {
+                System.out.println("The number of mails is incorrect !");
+
+                // we must add mails in the list (one at least)
+                System.exit(-1);
+            }
+
         }
         catch (IOException ex) {
             ex.printStackTrace();
@@ -175,7 +182,7 @@ public class ConfigurationManager implements IConfigurationManager {
     @Override
     public List<Person> getVictimsList() {
         // for the encapsulation
-        return new ArrayList<>(victimsList);
+        return new LinkedList<>(victimsList);
     }
 
     @Override

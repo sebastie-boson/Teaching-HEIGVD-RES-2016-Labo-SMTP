@@ -1,7 +1,6 @@
 package model.mail;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -20,5 +19,13 @@ public class Group {
 
     public Person getPersonAt(int index) {
         return personsList.get(index);
+    }
+
+    public Person removePersonAt(int index) {
+        return personsList.remove(index);
+    }
+
+    public int getGroupSize() {
+        return personsList.size();
     }
 }

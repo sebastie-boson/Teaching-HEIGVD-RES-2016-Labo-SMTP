@@ -5,11 +5,9 @@ import model.mail.Group;
 import model.mail.Mail;
 import model.mail.Person;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
+import java.nio.charset.CharsetEncoder;
 
 /**
  * Created by sebbos on 15.04.2016.
@@ -23,17 +21,19 @@ public class SmtpClient implements ISmtpClient {
     }
 
     @Override
-    public void sendMail(Group group, Person witnessToCC, Mail mail) {
+    public void sendMail(Person fromPerson, Person witnessToCC, Group toPersons, Mail mail) {
+        int indexBoucle;
+
         Socket clientSocket = null;
-        BufferedOutputStream bufferedOutputStream = null;
-        BufferedInputStream bufferedInputStream = null;
+        OutputStream os = null;
+        InputStream is = null;
 
         final int BUFFER_SIZE = 500;
 
         try {
             clientSocket = new Socket(configManager.getSmtpServerAddress(), configManager.getSmtpServerPort());
-            bufferedOutputStream = new BufferedOutputStream(clientSocket.getOutputStream());
-            bufferedInputStream = new BufferedInputStream(clientSocket.getInputStream());
+            os = clientSocket.getOutputStream();
+            is = clientSocket.getInputStream();
 
             ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream();
             byte[] buffer = new byte[BUFFER_SIZE];
@@ -45,58 +45,81 @@ public class SmtpClient implements ISmtpClient {
                 System.out.println("Response : " + responseBuffer);
             }*/
 
-            newBytes = bufferedInputStream.read(buffer);
+            newBytes = is.read(buffer);
             responseBuffer.write(buffer, 0, newBytes);
             System.out.println(responseBuffer);
 
             // initiation
-            bufferedOutputStream.write("ehlo res\r\n".getBytes());
-            bufferedOutputStream.flush();
+            os.write(("EHLO res\r\n").getBytes());
+            os.flush();
 
-            newBytes = bufferedInputStream.read(buffer);
+            newBytes = is.read(buffer);
             responseBuffer.write(buffer, 0, newBytes);
             System.out.println(responseBuffer);
 
             // mail from
-            bufferedOutputStream.write(("MAIL FROM: " + fromPerson.getMailAddress() + "\r\n").getBytes());
-            bufferedOutputStream.flush();
+            os.write(("MAIL FROM: " + fromPerson.getMailAddress() + "\r\n").getBytes());
+            os.flush();
 
-            newBytes = bufferedInputStream.read(buffer);
+            newBytes = is.read(buffer);
+            responseBuffer.write(buffer, 0, newBytes);
+            System.out.println(responseBuffer);
+
+            // witness mail to
+            os.write(("RCPT TO: " + witnessToCC.getMailAddress() + "\r\n").getBytes());
+            os.flush();
+
+            newBytes = is.read(buffer);
             responseBuffer.write(buffer, 0, newBytes);
             System.out.println(responseBuffer);
 
             // mail to
-            for (int i = 0; i < toPersons.size(); i++) {
-                bufferedOutputStream.write(("RCPT TO: " + toPersons.get(i).getMailAddress() + "\r\n").getBytes());
-                bufferedOutputStream.flush();
+            for (int i = 0; i < toPersons.getGroupSize(); i++) {
+                os.write(("RCPT TO: " + toPersons.getPersonAt(i).getMailAddress() + "\r\n").getBytes());
+                os.flush();
 
-                newBytes = bufferedInputStream.read(buffer);
+                newBytes = is.read(buffer);
                 responseBuffer.write(buffer, 0, newBytes);
                 System.out.println(responseBuffer);
             }
 
             // data
-            bufferedOutputStream.write("DATA\r\n".getBytes());
-            bufferedOutputStream.flush();
+            os.write("DATA\r\n".getBytes());
+            os.flush();
 
-            newBytes = bufferedInputStream.read(buffer);
+            newBytes = is.read(buffer);
             responseBuffer.write(buffer, 0, newBytes);
             System.out.println(responseBuffer);
 
+            // add from person
+            os.write(("From: " + fromPerson.getMailAddress() + "\r\n").getBytes());
+
+            // add to persons
+            os.write(("To: ").getBytes());
+
+            for (indexBoucle = 0; indexBoucle < toPersons.getGroupSize() - 1; indexBoucle++) {
+                os.write((toPersons.getPersonAt(indexBoucle).getMailAddress() + ", ").getBytes());
+            }
+
+            os.write((toPersons.getPersonAt(indexBoucle).getMailAddress() + "\r\n").getBytes());
+
+            // add cc person
+            os.write(("Cc: " + witnessToCC.getMailAddress() + "\r\n").getBytes());
+
             // content of mail
             // . for terminate
-            bufferedOutputStream.write((mail.getContent() + "\r\n.\r\n").getBytes());
-            bufferedOutputStream.flush();
+            os.write((mail.getContent() + "\r\n.\r\n").getBytes());
+            os.flush();
 
-            newBytes = bufferedInputStream.read(buffer);
+            newBytes = is.read(buffer);
             responseBuffer.write(buffer, 0, newBytes);
             System.out.println(responseBuffer);
 
             // quit
-            bufferedOutputStream.write("quit\r\n".getBytes());
-            bufferedOutputStream.flush();
+            os.write("quit\r\n".getBytes());
+            os.flush();
 
-            newBytes = bufferedInputStream.read(buffer);
+            newBytes = is.read(buffer);
             responseBuffer.write(buffer, 0, newBytes);
             System.out.println(responseBuffer);
 
@@ -113,17 +136,17 @@ public class SmtpClient implements ISmtpClient {
                     e.printStackTrace();
                 }
             }
-            else if (bufferedInputStream != null) {
+            else if (os != null) {
                 try {
-                    bufferedInputStream.close();
+                    os.close();
                 }
                 catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            else if (bufferedOutputStream != null) {
+            else if (is != null) {
                 try {
-                    bufferedOutputStream.close();
+                    is.close();
                 }
                 catch (IOException e) {
                     e.printStackTrace();
