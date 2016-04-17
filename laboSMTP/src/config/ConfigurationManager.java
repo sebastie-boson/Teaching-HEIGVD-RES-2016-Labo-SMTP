@@ -23,7 +23,8 @@ public class ConfigurationManager implements IConfigurationManager {
     // indicates where is located the directory who contains the files for the application
     private static final String FILES_DIRECTORY = "./config/";
     // indicates file extension
-    private static final String EXTENSION_FILE = "UTF-8";
+    // accessible outside the class
+    public static final String EXTENSION_FILE = "UTF-8";
     // separator for the different mails
     private static final String MAILS_SEPARATOR = "==";
     // minimal victims for a group
@@ -57,15 +58,15 @@ public class ConfigurationManager implements IConfigurationManager {
 
             // test if number of groups is correct
             if (groupsNumber < 1) {
-                System.out.println("The number of group is incorrect !");
-
-                // we must change the number of group
-                System.exit(-1);
+                throw new IOException("The number of group is incorrect !");
             }
 
         }
         catch (IOException ex) {
             ex.printStackTrace();
+
+            // quit the program
+            System.exit(-1);
         }
         finally {
             if (input != null){
@@ -74,6 +75,9 @@ public class ConfigurationManager implements IConfigurationManager {
                 }
                 catch (IOException e) {
                     e.printStackTrace();
+
+                    // quit the program
+                    System.exit(-1);
                 }
             }
         }
@@ -94,15 +98,15 @@ public class ConfigurationManager implements IConfigurationManager {
             // test if number of victims is correct
             // we must have three victims or more
             if (victimsList.size() < VICTIMS_MINIMAL_NUMBER) {
-                System.out.println("The number of victims is incorrect !");
-
-                // we must add victims in the list
-                System.exit(-1);
+                throw new IOException("The number of victims is incorrect !");
             }
 
         }
         catch (IOException ex) {
             ex.printStackTrace();
+
+            // quit the program
+            System.exit(-1);
         }
         finally {
             if (bufferedReader != null){
@@ -111,6 +115,9 @@ public class ConfigurationManager implements IConfigurationManager {
                 }
                 catch (IOException e) {
                     e.printStackTrace();
+
+                    // quit the program
+                    System.exit(-1);
                 }
             }
         }
@@ -121,31 +128,38 @@ public class ConfigurationManager implements IConfigurationManager {
         BufferedReader bufferedReader = null;
         String emailContent = "";
         String fileLine;
+        int indexBoucle = 0;
 
         try {
             bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(FILES_DIRECTORY + fileName), EXTENSION_FILE));
 
             while ((fileLine = bufferedReader.readLine()) != null)   {
-                if (!fileLine.contentEquals(MAILS_SEPARATOR)) {
-                    emailContent += fileLine + "\n";
+                if (fileLine.startsWith("Subject: ")) {
+                    mailsList.add(new Mail());
+
+                    mailsList.get(indexBoucle).setSubject(fileLine.replace("Subject: ", ""));
+                }
+                else if (!fileLine.contentEquals(MAILS_SEPARATOR)) {
+                    emailContent += fileLine + "\r\n";
                 }
                 else {
-                    mailsList.add(new Mail(emailContent));
-
+                    mailsList.get(indexBoucle).setContent(emailContent);
                     emailContent = "";
+
+                    indexBoucle++;
                 }
             }
 
             if (mailsList.size() < 1) {
-                System.out.println("The number of mails is incorrect !");
-
-                // we must add mails in the list (one at least)
-                System.exit(-1);
+                throw new IOException("The number of mails is incorrect !");
             }
 
         }
         catch (IOException ex) {
             ex.printStackTrace();
+
+            // quit the program
+            System.exit(-1);
         }
         finally {
             if (bufferedReader != null){
@@ -154,6 +168,9 @@ public class ConfigurationManager implements IConfigurationManager {
                 }
                 catch (IOException e) {
                     e.printStackTrace();
+
+                    // quit the program
+                    System.exit(-1);
                 }
             }
         }

@@ -7,7 +7,6 @@ import model.mail.Person;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.CharsetEncoder;
 
 /**
  * Created by sebbos on 15.04.2016.
@@ -25,107 +24,120 @@ public class SmtpClient implements ISmtpClient {
         int indexBoucle;
 
         Socket clientSocket = null;
-        OutputStream os = null;
-        InputStream is = null;
-
-        final int BUFFER_SIZE = 500;
+        PrintWriter writer = null;
+        BufferedReader bufferedReader = null;
+        String line;
 
         try {
             clientSocket = new Socket(configManager.getSmtpServerAddress(), configManager.getSmtpServerPort());
-            os = clientSocket.getOutputStream();
-            is = clientSocket.getInputStream();
 
-            ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream();
-            byte[] buffer = new byte[BUFFER_SIZE];
-            int newBytes;
+            writer = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), ConfigurationManager.EXTENSION_FILE), true);
+            bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), ConfigurationManager.EXTENSION_FILE));
 
-            // read the response of the server
-           /* while ((newBytes = is.read(buffer)) != -1) {
-                responseBuffer.write(buffer, 0, newBytes);
-                System.out.println("Response : " + responseBuffer);
-            }*/
-
-            newBytes = is.read(buffer);
-            responseBuffer.write(buffer, 0, newBytes);
-            System.out.println(responseBuffer);
+            // first response of the server
+            line = bufferedReader.readLine();
+            System.out.println(line + "\n");
 
             // initiation
-            os.write(("EHLO res\r\n").getBytes());
-            os.flush();
+            writer.printf("EHLO res\r\n");
 
-            newBytes = is.read(buffer);
-            responseBuffer.write(buffer, 0, newBytes);
-            System.out.println(responseBuffer);
+            // read response
+            line = bufferedReader.readLine();
+            System.out.println(line);
+
+            // error with the smtp server
+            if (!line.startsWith("250")) {
+                throw new IOException("SMTP error: " + line);
+            }
+
+            while (line.startsWith("250-")) {
+                line = bufferedReader.readLine();
+                System.out.println(line);
+            }
 
             // mail from
-            os.write(("MAIL FROM: " + fromPerson.getMailAddress() + "\r\n").getBytes());
-            os.flush();
+            writer.write("MAIL FROM: ");
+            writer.write(fromPerson.getMailAddress());
+            writer.write("\r\n");
+            writer.flush();
 
-            newBytes = is.read(buffer);
-            responseBuffer.write(buffer, 0, newBytes);
-            System.out.println(responseBuffer);
+            // read response
+            line = bufferedReader.readLine();
+            System.out.println("\n" + line + "\n");
 
             // witness mail to
-            os.write(("RCPT TO: " + witnessToCC.getMailAddress() + "\r\n").getBytes());
-            os.flush();
+            writer.write("RCPT TO: ");
+            writer.write(witnessToCC.getMailAddress());
+            writer.write("\r\n");
+            writer.flush();
 
-            newBytes = is.read(buffer);
-            responseBuffer.write(buffer, 0, newBytes);
-            System.out.println(responseBuffer);
+            // read response
+            line = bufferedReader.readLine();
+            System.out.println(line + "\n");
 
             // mail to
             for (int i = 0; i < toPersons.getGroupSize(); i++) {
-                os.write(("RCPT TO: " + toPersons.getPersonAt(i).getMailAddress() + "\r\n").getBytes());
-                os.flush();
+                writer.write("RCPT TO: ");
+                writer.write(toPersons.getPersonAt(i).getMailAddress());
+                writer.write("\r\n");
+                writer.flush();
 
-                newBytes = is.read(buffer);
-                responseBuffer.write(buffer, 0, newBytes);
-                System.out.println(responseBuffer);
+                // read response
+                line = bufferedReader.readLine();
+                System.out.println(line + "\n");
             }
 
             // data
-            os.write("DATA\r\n".getBytes());
-            os.flush();
+            writer.printf("DATA\r\n");
 
-            newBytes = is.read(buffer);
-            responseBuffer.write(buffer, 0, newBytes);
-            System.out.println(responseBuffer);
+            // read response
+            line = bufferedReader.readLine();
+            System.out.println(line + "\n");
+
+            // specify the content type and the charset
+            writer.write("Content-Type: text/plain; charset=\"" + ConfigurationManager.EXTENSION_FILE + "\"\r\n");
 
             // add from person
-            os.write(("From: " + fromPerson.getMailAddress() + "\r\n").getBytes());
+            writer.write("From: " + fromPerson.getMailAddress() + "\r\n");
 
             // add to persons
-            os.write(("To: ").getBytes());
+            writer.write("To: ");
 
             for (indexBoucle = 0; indexBoucle < toPersons.getGroupSize() - 1; indexBoucle++) {
-                os.write((toPersons.getPersonAt(indexBoucle).getMailAddress() + ", ").getBytes());
+                writer.write(toPersons.getPersonAt(indexBoucle).getMailAddress() + ", ");
             }
 
-            os.write((toPersons.getPersonAt(indexBoucle).getMailAddress() + "\r\n").getBytes());
+            writer.write(toPersons.getPersonAt(indexBoucle).getMailAddress() + "\r\n");
 
             // add cc person
-            os.write(("Cc: " + witnessToCC.getMailAddress() + "\r\n").getBytes());
+            writer.write("Cc: " + witnessToCC.getMailAddress() + "\r\n");
+
+            // add mail subject in utf-8 format
+            writer.write("Subject: =?utf-8?Q?" + mail.getSubject() + "?=\r\n");
 
             // content of mail
+            writer.write(mail.getContent());
             // . for terminate
-            os.write((mail.getContent() + "\r\n.\r\n").getBytes());
-            os.flush();
+            writer.write(".\r\n");
+            writer.flush();
 
-            newBytes = is.read(buffer);
-            responseBuffer.write(buffer, 0, newBytes);
-            System.out.println(responseBuffer);
+            // read response
+            line = bufferedReader.readLine();
+            System.out.println(line + "\n");
 
             // quit
-            os.write("quit\r\n".getBytes());
-            os.flush();
+            writer.printf("QUIT\r\n");
 
-            newBytes = is.read(buffer);
-            responseBuffer.write(buffer, 0, newBytes);
-            System.out.println(responseBuffer);
+            // read response
+            line = bufferedReader.readLine();
+            System.out.println(line);
 
         }
         catch (IOException ex) {
             ex.printStackTrace();
+
+            // quit the program
+            System.exit(-1);
         }
         finally {
             if (clientSocket != null){
@@ -134,22 +146,23 @@ public class SmtpClient implements ISmtpClient {
                 }
                 catch (IOException e) {
                     e.printStackTrace();
+
+                    // quit the program
+                    System.exit(-1);
                 }
             }
-            else if (os != null) {
+            else if (writer != null) {
+                writer.close();
+            }
+            else if (bufferedReader != null) {
                 try {
-                    os.close();
+                    bufferedReader.close();
                 }
                 catch (IOException e) {
                     e.printStackTrace();
-                }
-            }
-            else if (is != null) {
-                try {
-                    is.close();
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
+
+                    // quit the program
+                    System.exit(-1);
                 }
             }
         }

@@ -25,7 +25,7 @@ public class PranksGenerator {
     private List<Prank> pranksList;
     private Random generator;
 
-    public PranksGenerator() {
+    public PranksGenerator() throws IllegalArgumentException {
         configManager = new ConfigurationManager();
 
         configManager.loadPropertiesFromFile("config.properties");
@@ -38,6 +38,11 @@ public class PranksGenerator {
         victimsNumber = configManager.getVictimsList().size();
         victimsByGroupe = victimsNumber / groupsNumber;
 
+        // test if number of groups and victims are coherent
+        if (groupsNumber > 1 && victimsNumber < groupsNumber * ConfigurationManager.VICTIMS_MINIMAL_NUMBER) {
+            throw new IllegalArgumentException("The number of victims is incorrect");
+        }
+
         witnessToCC = configManager.getWitnessToCC();
         victimsList = configManager.getVictimsList();
         groupsList = new ArrayList<Group>();
@@ -47,20 +52,8 @@ public class PranksGenerator {
     }
 
     public void launch() {
-        // test if number of groups and victims are coherent
-        if (groupsNumber > 1 && victimsNumber < groupsNumber * ConfigurationManager.VICTIMS_MINIMAL_NUMBER) {
-            System.out.println("The number of victims is incorrect !");
+        // first, generate groups
 
-            // we must add victims in the list
-            System.exit(-1);
-        }
-
-        generateGroups();
-
-        sendPranks();
-    }
-
-    private void generateGroups() {
         // shuffle the list of victims
         Collections.shuffle(victimsList);
 
@@ -76,6 +69,9 @@ public class PranksGenerator {
         while (victimsList.size() != 0) {
             groupsList.get(groupsList.size() - 1).addPerson(victimsList.remove(0));
         }
+
+        // then, generate pranks
+        sendPranks();
     }
 
     private void sendPranks() {
