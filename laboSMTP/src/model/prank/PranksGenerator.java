@@ -6,10 +6,13 @@ import model.mail.Mail;
 import model.mail.Person;
 import smtp.SmtpClient;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
- * Created by sebbos on 16.04.2016.
+ * Class used to generate pranks with the specified victims and number of groups (of victims) and to send these pranks.
+ *
+ * @author Mathieu Urstein and Sébastien Boson
  */
 public class PranksGenerator {
     private int groupsNumber;
@@ -23,24 +26,33 @@ public class PranksGenerator {
     private List<Group> groupsList;
     private List<Mail> mailsList;
     private List<Prank> pranksList;
+    // to generate a random number to choice a mail from the list
     private Random generator;
 
-    public PranksGenerator() throws IllegalArgumentException {
+    /**
+     * constructor of the class PranksGenerator
+     *
+     * @throws IOException
+     */
+    public PranksGenerator() throws IOException {
         configManager = new ConfigurationManager();
 
+        // we load the content of the needed files
         configManager.loadPropertiesFromFile("config.properties");
         configManager.loadVictimsListFromFile("victims.utf8");
         configManager.loadMailsListFromFile("mails.utf8");
 
+        // we create the SmtpClient object from the ConfigurationManager object
         smtpClient = new SmtpClient(configManager);
 
         groupsNumber = configManager.getGroupsNumber();
         victimsNumber = configManager.getVictimsList().size();
+        // number of victims by group
         victimsByGroupe = victimsNumber / groupsNumber;
 
-        // test if number of groups and victims are coherent
-        if (groupsNumber > 1 && victimsNumber < groupsNumber * ConfigurationManager.VICTIMS_MINIMAL_NUMBER) {
-            throw new IllegalArgumentException("The number of victims is incorrect");
+        // check if number of groups and victims are coherent
+        if (groupsNumber > 1 && victimsNumber < groupsNumber * ConfigurationManager.VICTIMS_MINIMUM_NUMBER) {
+            throw new IOException("The number of victims is incorrect");
         }
 
         witnessToCC = configManager.getWitnessToCC();
@@ -51,12 +63,16 @@ public class PranksGenerator {
         generator = new Random();
     }
 
+    /**
+     * launch this campaign of pranks
+     */
     public void launch() {
         // first, generate groups
 
         // shuffle the list of victims
         Collections.shuffle(victimsList);
 
+        // we create a group and add victims to it
         for (int i = 0; i < groupsNumber; i++) {
             groupsList.add(new Group());
 
@@ -74,6 +90,9 @@ public class PranksGenerator {
         sendPranks();
     }
 
+    /**
+     * generate and send pranks
+     */
     private void sendPranks() {
         Mail mailToSend;
 

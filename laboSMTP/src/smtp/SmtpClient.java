@@ -9,12 +9,18 @@ import java.io.*;
 import java.net.Socket;
 
 /**
- * Created by sebbos on 15.04.2016.
+ * Implementation of the ISmtpClient interface to send mails for a prank campaign.
+ *
+ * @author Mathieu Urstein and Sébastien Boson
  */
 public class SmtpClient implements ISmtpClient {
     private ConfigurationManager configManager;
 
-
+    /**
+     * constructor of the class SmtpClient
+     *
+     * @param configManager ConfigurationManager object for the connection with the smpt server
+     */
     public SmtpClient(ConfigurationManager configManager) {
         this.configManager = configManager;
     }
@@ -22,15 +28,16 @@ public class SmtpClient implements ISmtpClient {
     @Override
     public void sendMail(Person fromPerson, Person witnessToCC, Group toPersons, Mail mail) {
         int indexBoucle;
+        String line;
 
         Socket clientSocket = null;
         PrintWriter writer = null;
         BufferedReader bufferedReader = null;
-        String line;
 
         try {
             clientSocket = new Socket(configManager.getSmtpServerAddress(), configManager.getSmtpServerPort());
 
+            // true for flush automatically when use printf method
             writer = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), ConfigurationManager.EXTENSION_FILE), true);
             bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), ConfigurationManager.EXTENSION_FILE));
 
@@ -135,9 +142,6 @@ public class SmtpClient implements ISmtpClient {
         }
         catch (IOException ex) {
             ex.printStackTrace();
-
-            // quit the program
-            System.exit(-1);
         }
         finally {
             if (clientSocket != null){
@@ -146,9 +150,6 @@ public class SmtpClient implements ISmtpClient {
                 }
                 catch (IOException e) {
                     e.printStackTrace();
-
-                    // quit the program
-                    System.exit(-1);
                 }
             }
             else if (writer != null) {
@@ -160,9 +161,6 @@ public class SmtpClient implements ISmtpClient {
                 }
                 catch (IOException e) {
                     e.printStackTrace();
-
-                    // quit the program
-                    System.exit(-1);
                 }
             }
         }

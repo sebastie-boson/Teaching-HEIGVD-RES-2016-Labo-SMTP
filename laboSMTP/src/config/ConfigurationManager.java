@@ -10,12 +10,16 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * Created by sebbos on 15.04.2016.
+ * Implementation of the IConfigurationManager interface to collect data from a configuration file config.properties and
+ * from two other files victims.utf8 and mails.utf8.
+ *
+ * @author Mathieu Urstein and Sébastien Boson
  */
 public class ConfigurationManager implements IConfigurationManager {
     private String smtpServerAddress;
     private int smtpServerPort;
     private int groupsNumber;
+
     private Person witnessToCC;
     private List<Person> victimsList;
     private List<Mail> mailsList;
@@ -27,12 +31,16 @@ public class ConfigurationManager implements IConfigurationManager {
     public static final String EXTENSION_FILE = "UTF-8";
     // separator for the different mails
     private static final String MAILS_SEPARATOR = "==";
-    // minimal victims for a group
+    // minimum number of groups
+    private static final int GROUPS_MINIMUM_NUMBER = 1;
+    // minimum number of victims for a group
     // accessible outside the class
-    public static final int VICTIMS_MINIMAL_NUMBER = 3;
+    public static final int VICTIMS_MINIMUM_NUMBER = 3;
+    // minimum number of mails
+    private static final int  MAILS_MINIMUM_NUMBER = 1;
 
     /**
-     * constructeur of the class ConfigurationManager
+     * constructor of the class ConfigurationManager
      */
     public ConfigurationManager() {
         victimsList = new ArrayList<Person>();
@@ -40,140 +48,87 @@ public class ConfigurationManager implements IConfigurationManager {
     }
 
     @Override
-    public void loadPropertiesFromFile(String fileName) {
+    public void loadPropertiesFromFile(String fileName) throws IOException {
         Properties prop = new Properties();
-        InputStream input = null;
+        InputStream input = new FileInputStream(FILES_DIRECTORY + fileName);
 
-        try {
-            input = new FileInputStream(FILES_DIRECTORY + fileName);
+        // load a properties file
+        prop.load(input);
 
-            // load a properties file
-            prop.load(input);
+        // get the property value and store it
+        smtpServerAddress = prop.getProperty("smtpServerAddress");
+        smtpServerPort = Integer.valueOf(prop.getProperty("smtpServerPort"));
+        groupsNumber = Integer.valueOf(prop.getProperty("groupsNumber"));
+        witnessToCC = new Person(prop.getProperty("witnessToCC"));
 
-            // get the property value and stock it
-            smtpServerAddress = prop.getProperty("smtpServerAddress");
-            smtpServerPort = Integer.valueOf(prop.getProperty("smtpServerPort"));
-            groupsNumber = Integer.valueOf(prop.getProperty("groupsNumber"));
-            witnessToCC = new Person(prop.getProperty("witnessToCC"));
-
-            // test if number of groups is correct
-            if (groupsNumber < 1) {
-                throw new IOException("The number of group is incorrect !");
-            }
-
+        // check if number of groups is correct
+        if (groupsNumber < GROUPS_MINIMUM_NUMBER) {
+            throw new IOException("The number of groups is incorrect !");
         }
-        catch (IOException ex) {
-            ex.printStackTrace();
 
-            // quit the program
-            System.exit(-1);
-        }
-        finally {
-            if (input != null){
-                try {
-                    input.close();
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-
-                    // quit the program
-                    System.exit(-1);
-                }
-            }
-        }
+        // close input
+        input.close();
     }
 
     @Override
-    public void loadVictimsListFromFile(String fileName) {
-        BufferedReader bufferedReader = null;
+    public void loadVictimsListFromFile(String fileName) throws IOException {
         String fileLine;
 
-        try {
-            bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(FILES_DIRECTORY + fileName), EXTENSION_FILE));
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(FILES_DIRECTORY + fileName), EXTENSION_FILE));
 
-            while ((fileLine = bufferedReader.readLine()) != null)   {
-                victimsList.add(new Person(fileLine));
-            }
-
-            // test if number of victims is correct
-            // we must have three victims or more
-            if (victimsList.size() < VICTIMS_MINIMAL_NUMBER) {
-                throw new IOException("The number of victims is incorrect !");
-            }
-
+        while ((fileLine = bufferedReader.readLine()) != null) {
+            // we create a new Person for each victim
+            victimsList.add(new Person(fileLine));
         }
-        catch (IOException ex) {
-            ex.printStackTrace();
 
-            // quit the program
-            System.exit(-1);
+        // check if number of victims is correct
+        // we must have three victims or more
+        if (victimsList.size() < VICTIMS_MINIMUM_NUMBER) {
+            throw new IOException("The number of victims is incorrect !");
         }
-        finally {
-            if (bufferedReader != null){
-                try {
-                    bufferedReader.close();
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
 
-                    // quit the program
-                    System.exit(-1);
-                }
-            }
-        }
+        // close buffer
+        bufferedReader.close();
     }
 
     @Override
-    public void loadMailsListFromFile(String fileName) {
-        BufferedReader bufferedReader = null;
+    public void loadMailsListFromFile(String fileName) throws IOException {
         String emailContent = "";
         String fileLine;
-        int indexBoucle = 0;
+        int indexLoop = 0;
 
-        try {
-            bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(FILES_DIRECTORY + fileName), EXTENSION_FILE));
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(FILES_DIRECTORY + fileName), EXTENSION_FILE));
 
-            while ((fileLine = bufferedReader.readLine()) != null)   {
-                if (fileLine.startsWith("Subject: ")) {
-                    mailsList.add(new Mail());
+        while ((fileLine = bufferedReader.readLine()) != null) {
+            if (fileLine.startsWith("Subject: ")) {
+                // we create a new mail
+                mailsList.add(new Mail());
 
-                    mailsList.get(indexBoucle).setSubject(fileLine.replace("Subject: ", ""));
-                }
-                else if (!fileLine.contentEquals(MAILS_SEPARATOR)) {
-                    emailContent += fileLine + "\r\n";
-                }
-                else {
-                    mailsList.get(indexBoucle).setContent(emailContent);
-                    emailContent = "";
-
-                    indexBoucle++;
-                }
+                // only the content of the subject is added to the Mail object
+                mailsList.get(indexLoop).setSubject(fileLine.replace("Subject: ", ""));
             }
-
-            if (mailsList.size() < 1) {
-                throw new IOException("The number of mails is incorrect !");
+            else if (!fileLine.contentEquals(MAILS_SEPARATOR)) {
+                // we store each line of the mail
+                emailContent += fileLine + "\r\n";
             }
+            else {
+                // when we finished to read a mail, we put its content in the Mail object
+                mailsList.get(indexLoop).setContent(emailContent);
+                // clear for the next mail
+                emailContent = "";
 
-        }
-        catch (IOException ex) {
-            ex.printStackTrace();
-
-            // quit the program
-            System.exit(-1);
-        }
-        finally {
-            if (bufferedReader != null){
-                try {
-                    bufferedReader.close();
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-
-                    // quit the program
-                    System.exit(-1);
-                }
+                // for the next mail
+                indexLoop++;
             }
         }
+
+        // check if we have the minimum number of mails required
+        if (mailsList.size() < MAILS_MINIMUM_NUMBER) {
+            throw new IOException("The number of mails is incorrect !");
+        }
+
+        // close buffer
+        bufferedReader.close();
     }
 
     @Override
