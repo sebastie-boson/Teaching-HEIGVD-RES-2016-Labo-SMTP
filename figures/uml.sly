@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="iso-8859-15" standalone="no"?>
+<classDiagram>
+  <diagramElements>
+    <entity entityType="CLASS" id="16882" isAbstract="false" name="ConfigurationManager" visibility="PUBLIC">
+      <attribute const="false" defaultValue="" isStatic="false" name="smtpServerAddress" type="String" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="false" name="smtpServerPort" type="int" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="false" name="groupsNumber" type="int" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="false" name="witnessToCC" type="Person" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="false" name="victimsList" type="ListPerson" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="false" name="mailsList" type="ListMail" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="true" name="FILES_DIRECTORY" type="String" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="true" name="EXTENSION_FILE" type="String" visibility="PUBLIC"/>
+      <attribute const="false" defaultValue="" isStatic="true" name="MAILS_SEPARATOR" type="String" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="true" name="GROUPS_MINIMUM_NUMBER" type="int" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="true" name="VICTIMS_MINIMUM_NUMBER" type="int" visibility="PUBLIC"/>
+      <attribute const="false" defaultValue="" isStatic="true" name="MAILS_MINIMUM_NUMBER" type="int" visibility="PRIVATE"/>
+      <method isAbstract="false" isStatic="false" name="loadPropertiesFromFile" returnType="void" view="DEFAULT" visibility="PUBLIC">
+        <variable const="false" name="fileName" type="String"/>
+      </method>
+      <method isAbstract="false" isStatic="false" name="loadVictimsListFromFile" returnType="void" view="DEFAULT" visibility="PUBLIC">
+        <variable const="false" name="fileName" type="String"/>
+      </method>
+      <method isAbstract="false" isStatic="false" name="loadMailsListFromFile" returnType="void" view="DEFAULT" visibility="PUBLIC">
+        <variable const="false" name="fileName" type="String"/>
+      </method>
+      <method isAbstract="false" isStatic="false" name="getSmtpServerAddress" returnType="String" view="DEFAULT" visibility="PUBLIC"/>
+      <method isAbstract="false" isStatic="false" name="getSmtpServerPort" returnType="int" view="DEFAULT" visibility="PUBLIC"/>
+      <method isAbstract="false" isStatic="false" name="getGroupsNumber" returnType="int" view="DEFAULT" visibility="PUBLIC"/>
+      <method isAbstract="false" isStatic="false" name="getWitnessToCC" returnType="Person" view="DEFAULT" visibility="PUBLIC"/>
+      <method isAbstract="false" isStatic="false" name="getVictimsList" returnType="ListPerson" view="DEFAULT" visibility="PUBLIC"/>
+      <method isAbstract="false" isStatic="false" name="getMailsList" returnType="ListMail" view="DEFAULT" visibility="PUBLIC"/>
+    </entity>
+    <entity entityType="CLASS" id="16501" isAbstract="false" name="PranksGenerator" visibility="PUBLIC">
+      <attribute const="false" defaultValue="" isStatic="false" name="groupsNumber" type="int" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="false" name="victimsNumber" type="int" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="false" name="victimsByGroupe" type="int" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="false" name="configManager" type="ConfigurationManager" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="false" name="smtpClient" type="SmtpClient" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="false" name="witnessToCC" type="Person" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="false" name="victimsList" type="ListPerson" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="false" name="groupsList" type="ListGroup" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="false" name="mailsList" type="ListMail" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="false" name="pranksList" type="ListPrank" visibility="PRIVATE"/>
+      <attribute const="false" defaultValue="" isStatic="false" name="generator" type="Random" visibility="PRIVATE"/>
+      <method isAbstract="false" isStatic="false" name="launch" returnType="void" view="DEFAULT" visibility="PUBLIC"/>
+      <method isAbstract="false" isStatic="false" name="sendPranks" returnType="void" view="DEFAULT" visibility="PRIVATE"/>
+    </entity>
+    <entity entityType="CLASS" id="16343" isAbstract="false" name="SmtpClient" visibility="PUBLIC">
+      <attribute const="false" defaultValue="" isStatic="false" name="configManager" type="ConfigurationManager" visibility="PRIVATE"/>
+      <method isAbstract="false" isStatic="false" name="sendMail" returnType="void" view="DEFAULT" visibility="PUBLIC">
+        <variable const="false" name="fromPerson" type="Person"/>
+        <variable const="false" name="witnessToCC" type="Person"/>
+        <variable const="false" name="toPersons" type="Group"/>
+        <variable const="false" name="mail" type="Mail"/>
+      </method>
+    </entity>
+    <entity entityType="CLASS" id="16309" isAbstract="false" name="MailRobot" visibility="PUBLIC">
+      <method isAbstract="false" isStatic="true" name="main" returnType="void" view="DEFAULT" visibility="PUBLIC">
+        <variable const="false" name="args" type="String[]"/>
+      </method>
+    </entity>
+  </diagramElements>
+  <umlView grid="10" name="view no name">
+    <componentView color="-2079" componentID="16309" displayAttributes="true" displayDefault="true" displayMethods="true">
+      <geometry>
+        <x>70</x>
+        <y>190</y>
+        <w>230</w>
+        <h>72</h>
+      </geometry>
+    </componentView>
+    <componentView color="-2079" componentID="16343" displayAttributes="true" displayDefault="true" displayMethods="true">
+      <geometry>
+        <x>450</x>
+        <y>180</y>
+        <w>550</w>
+        <h>88</h>
+      </geometry>
+    </componentView>
+    <componentView color="-2079" componentID="16501" displayAttributes="true" displayDefault="true" displayMethods="true">
+      <geometry>
+        <x>240</x>
+        <y>360</y>
+        <w>280</w>
+        <h>264</h>
+      </geometry>
+    </componentView>
+    <componentView color="-2079" componentID="16882" displayAttributes="true" displayDefault="true" displayMethods="true">
+      <geometry>
+        <x>680</x>
+        <y>360</y>
+        <w>360</w>
+        <h>392</h>
+      </geometry>
+    </componentView>
+  </umlView>
+</classDiagram>

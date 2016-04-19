@@ -52,7 +52,7 @@ public class SmtpClient implements ISmtpClient {
             line = bufferedReader.readLine();
             System.out.println(line);
 
-            // error with the smtp server
+            // error with the SMTP server
             if (!line.startsWith("250")) {
                 throw new IOException("SMTP error: " + line);
             }
@@ -119,8 +119,8 @@ public class SmtpClient implements ISmtpClient {
             // add cc person
             writer.write("Cc: " + witnessToCC.getMailAddress() + "\r\n");
 
-            // add mail subject in utf-8 format
-            writer.write("Subject: =?utf-8?Q?" + mail.getSubject() + "?=\r\n");
+            // add mail subject in utf-8 format (header)
+            writer.write("Subject: =?" + ConfigurationManager.EXTENSION_FILE + "?Q?" + mail.getSubject() + "?=\r\n");
 
             // content of mail
             writer.write(mail.getContent());

@@ -5,7 +5,7 @@ import model.mail.Mail;
 import model.mail.Person;
 
 /**
- * Interface used to send the mail to the specified persons with the specified smtp configuration (server).
+ * Interface used to send the mail to the specified persons with the specified SMTP configuration (server).
  *
  * @author Mathieu Urstein and Sébastien Boson
  */

@@ -7,14 +7,14 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Interface used to collect data for the connection with a smtp server. It is also used to collect data for the list
+ * Interface used to collect data for the connection with a SMTP server. It is also used to collect data for the list
  * of victims and the list of mails.
  *
  * @author Mathieu Urstein and Sébastien Boson
  */
 public interface IConfigurationManager {
     /**
-     * load properties for the connection with a smtp server from the name of the specified properties file
+     * load properties for the connection with a SMTP server from the name of the specified properties file
      *
      * @param fileName the name of the properties file
      * @throws IOException
@@ -36,14 +36,14 @@ public interface IConfigurationManager {
      */
     void loadMailsListFromFile(String fileName) throws IOException;
     /**
-     * get the address of the smtp server
+     * get the address of the SMTP server
      *
-     * @return address of the smtp server
+     * @return address of the SMTP server
      */
     String getSmtpServerAddress();
 
     /**
-     * get the port of the smtp server
+     * get the port of the SMTP server
      *
      * @return port number
      */
