@@ -16,7 +16,7 @@ Dans le répertoire "laboSMTP", on trouve un dossier nommé "config" qui contien
 Pour pouvoir lancer une campagne, il suffit juste de modifier les trois fichiers contenus dans ce dossier avec ses propres configurations.
 Le fichier "config.properties" permet de définir l'adresse et le numéro de port du serveur SMTP à contacter pour l'envoi des mails. Il permet également de définir le nombre de groupes à créer
 à partir de la liste de victimes ainsi que l'adresse mail de la personne qui sera témoin des mails envoyés (mise en copie).
-Le fichier "victims.utf8" permet de définir la liste des adresses mails des victimes qui seront placées dans les différents groupes voulus.
+Le fichier "victims.utf8" permet de définir la liste des adresses mails des victimes <br /> qui seront placées dans les différents groupes voulus.
 Il est important de noter que le nombre minimal de victimes est de 3 personnes (addresses mail) par groupe et qu'il faut au moins demander la création d'un groupe pour ne pas avoir d'erreur lors
 du lancement du projet et de la campagne.
 Le dernier fichier "mail.utf8" permet simplement de définir le contenu des différents mails qui pourront être envoyés par un groupe. Il faut faire attention à séparer chaque mail par les caractères "=="
