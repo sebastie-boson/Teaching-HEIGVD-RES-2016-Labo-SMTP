@@ -47,11 +47,11 @@ Nous présentons maintenant ci-dessous deux exemples de communication (réponses
 
 ![image](./figures/exemple1.png)
 
-#### Exemple avec un serveur SMTP local (utilisation d'un serveur SMTP local mock, voir le chapitre d'après pour des explications d'utilisation).
+<i>Exemple avec un serveur SMTP local (utilisation d'un serveur SMTP local mock, voir le chapitre d'après pour des explications d'utilisation).</i>
 
 ![image](./figures/exemple2.png)
 
-#### Exemple avec le serveur SMTP "smtp.heig-vd.ch".
+<i>Exemple avec le serveur SMTP "smtp.heig-vd.ch".</i>
 
 Dans ces deux exemples, la syntaxe de communication est la même. On se connecte d'abord au serveur SMTP avec son adresse et son numéro de port. Le serveur nous répond ensuite avec un message de bienvenue en nous indiquant de quel type il est (système).
 Ensuite, nous lui transmettons un message avec le contenu "EHLO res" pour initier l'envoi de mails. Le serveur nous répond qu'il a bien reçu le message avec le code "250". Après, nous lui transmettons différentes commandes à la suite. Nous lui indiquons
