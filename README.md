@@ -54,10 +54,10 @@ Nous présentons maintenant ci-dessous deux exemples de communication (réponses
 <i>Exemple avec le serveur SMTP "smtp.heig-vd.ch".</i>
 
 Dans ces deux exemples, la syntaxe de communication est la même. On se connecte d'abord au serveur SMTP avec son adresse et son numéro de port. Le serveur nous répond ensuite avec un message de bienvenue en nous indiquant de quel type il est (système).
-Ensuite, nous lui transmettons un message avec le contenu "EHLO res" pour initier l'envoi de mails. Le serveur nous répond qu'il a bien reçu le message avec le code "250". Après, nous lui transmettons différentes commandes à la suite. Nous lui indiquons
-l'émetteur du mail, les récepteurs ainsi que la personne mise en copie. Nous utilisons pour cela les commandes "MAIL FROM: exemple@mail.com" (émetteur) et "RCPT TO: exemple@mail.com" (destinataire). Chaque fois que l'on envoie une commande au serveur, il faut
-attendre sa réponse. Cette dernière est souvent "Ok" avec le même code "250" (pour indiquer qu'il a bien reçu la commande). Enfin, il faut maintenant utiliser la commande "DATA" et attendre la réponse du serveur comme quoi il est prêt à recevoir le contenu du mail
-avec le code "354". Nous lui envoyons alors le contenu du mail et terminons avec un ".". Lorsque le serveur a confirmé la bonne réception des données, on ferme la connexion avec la commande "QUIT". Le serveur nous répond alors qu'il a bien reçu
+Ensuite, nous lui transmettons un message avec le contenu `EHLO res` pour initier l'envoi de mails. Le serveur nous répond qu'il a bien reçu le message avec le code "250". Après, nous lui transmettons différentes commandes à la suite. Nous lui indiquons
+l'émetteur du mail, les récepteurs ainsi que la personne mise en copie. Nous utilisons pour cela les commandes `MAIL FROM: exemple@mail.com` (émetteur) et `RCPT TO: exemple@mail.com` (destinataire). Chaque fois que l'on envoie une commande au serveur, il faut
+attendre sa réponse. Cette dernière est souvent "Ok" avec le même code "250" (pour indiquer qu'il a bien reçu la commande). Enfin, il faut maintenant utiliser la commande `DATA` et attendre la réponse du serveur comme quoi il est prêt à recevoir le contenu du mail
+avec le code "354". Nous lui envoyons alors le contenu du mail et terminons avec un `.`. Lorsque le serveur a confirmé la bonne réception des données, on ferme la connexion avec la commande `QUIT`. Le serveur nous répond alors qu'il a bien reçu
 la commande et fermé la session avec notre client (code "221").
 
 ## Instructions pour installer et utiliser un serveur local SMTP mock
@@ -66,10 +66,9 @@ Un serveur mock permet de simuler localement sur sa machine de test un serveur d
 risquer de générer du trafique pour rien. A la fin, bien sûr, il sera nécessaire d'utiliser un "vrai" serveur SMTP pour être sûr que son implémentation fonctionne correctement.
 
 Dans ce partage (racine) se trouve un fichier de type "jar" nommé "MockMock.jar". Il s'agit du fichier qui va permettre de lancer un serveur mock en local. Pour installer ce dernier, il suffit simplement de télécharger ce fichier sur sa machine. Ce fichier provient
-déjà d'un autre partage sur GitHub qui est disponible ici : [here](https://github.com/tweakers-dev/MockMock). Il est également possible de cloner ce partage (répertoire) sur sa machine avec Git et de lancer la compilation du projet en exécutant 
+déjà d'un autre partage sur GitHub qui est disponible à cette adresse : [here](https://github.com/tweakers-dev/MockMock). Il est également possible de cloner ce partage (répertoire) sur sa machine avec Git et de lancer la compilation du projet en exécutant 
 le fichier "pom.xml" avec Maven (Apache). Cela va créer un projet et il suffira d'aller dans le dossier "target" (généré) pour retrouver le bon fichier "jar" du serveur mock. <br />
-Pour utiliser ce serveur, il faut le lancer (fichier "jar") en ligne de commande (console système) en tapant la commande "java -jar MockMock.jar". Le serveur SMTP se lancera en local et sera à l'écoute sur le port 25 par défaut. L'interface Web permettant d'accéder aux
-mails reçus par le serveur SMTP sera accessible depuis le navigateur en tapant l'adresse "localhost:8282" (le port d'écoute pour l'interface Web est le 8282 par défaut). Pour changer les ports d'écoute, il faut utiliser les paramètres "-p" et "-h" en lançant le serveur. <br />
+Pour utiliser ce serveur, il faut le lancer (fichier "jar") en ligne de commande (console système) en tapant la commande `java -jar MockMock.jar`. Le serveur SMTP se lancera en local et sera à l'écoute sur le port 25 par défaut. L'interface Web permettant d'accéder aux mails reçus par le serveur SMTP sera accessible depuis le navigateur en tapant l'adresse "localhost:8282" (le port d'écoute pour l'interface Web est le 8282 par défaut). Pour changer les ports d'écoute, il faut utiliser les paramètres `-p` et `-h` en lançant le serveur. <br />
 Maintenant que le serveur SMTP est lancé et qu'on a accès à son interface Web. Il suffit d'envoyer nos mails à l'adresse "localhost" avec le port 25. Ces derniers seront directement visibles dans l'interface Web. Ils ne quitteront bien sûr pas
 notre serveur mock vu qu'il s'agit d'un serveur de test.
 
