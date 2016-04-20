@@ -49,7 +49,6 @@
       </method>
     </entity>
     <entity entityType="CLASS" id="16343" isAbstract="false" name="SmtpClient" visibility="PUBLIC">
-      <attribute const="false" defaultValue="" isStatic="false" name="configManager" type="ConfigurationManager" visibility="PRIVATE"/>
       <method isAbstract="false" isStatic="false" name="sendMail" returnType="void" view="DEFAULT" visibility="PUBLIC">
         <variable const="false" name="fromPerson" type="Person"/>
         <variable const="false" name="witnessToCC" type="Person"/>
@@ -252,7 +251,7 @@
         <x>1210</x>
         <y>560</y>
         <w>550</w>
-        <h>88</h>
+        <h>72</h>
       </geometry>
     </componentView>
     <componentView color="-2079" componentID="16309" displayAttributes="true" displayDefault="true" displayMethods="true">

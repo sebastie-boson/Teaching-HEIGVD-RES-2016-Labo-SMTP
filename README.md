@@ -55,7 +55,7 @@ Nous présentons maintenant ci-dessous deux exemples de communication (réponses
 
 Dans ces deux exemples, la syntaxe de communication est la même. On se connecte d'abord au serveur SMTP avec son adresse et son numéro de port. Le serveur nous répond ensuite avec un message de bienvenue en nous indiquant de quel type il est (système).
 Ensuite, nous lui transmettons un message avec le contenu "EHLO res" pour initier l'envoi de mails. Le serveur nous répond qu'il a bien reçu le message avec le code "250". Après, nous lui transmettons différentes commandes à la suite. Nous lui indiquons
-l'émetteur du mail, les récepteurs ainsi que la personne mise en copie. Nous utilisons pour cela les commandes "MAIL FROM: exemple@mail.com" (émetteur) et "RCPT TO: exemple@mail.com" (destinataire). Chaque fois que l'on envoie une commande au serveur, il faut
+l'émetteur du mail, les récepteurs ainsi que la personne mise en copie. Nous utilisons pour cela les commandes `MAIL FROM: exemple@mail.com` (émetteur) et "RCPT TO: exemple@mail.com" (destinataire). Chaque fois que l'on envoie une commande au serveur, il faut
 attendre sa réponse. Cette dernière est souvent "Ok" avec le même code "250" (pour indiquer qu'il a bien reçu la commande). Enfin, il faut maintenant utiliser la commande "DATA" et attendre la réponse du serveur comme quoi il est prêt à recevoir le contenu du mail
 avec le code "354". Nous lui envoyons alors le contenu du mail et terminons avec un ".". Lorsque le serveur a confirmé la bonne réception des données, on ferme la connexion avec la commande "QUIT". Le serveur nous répond alors qu'il a bien reçu
 la commande et fermé la session avec notre client (code "221").
